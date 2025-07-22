@@ -1,0 +1,27 @@
+/* LoginBox.css */
+
+.page-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #d66c6c;
+}
+
+.login-box {
+  background-color: rgb(20, 2, 2);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-width: 300px;
+}
+
+.login-box h1 {
+  margin-bottom: 24px;
+}
+
+.email-entry {
+  text-align: left;
+  margin-bottom: 16px;
+}

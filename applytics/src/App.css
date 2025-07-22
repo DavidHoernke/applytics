@@ -1,0 +1,14 @@
+.email-list {
+  margin: 40px auto;
+  max-width: 600px;
+  background: #1e1e1e;
+  padding: 30px;
+  border-radius: 10px;
+  color: white;
+}
+
+.email-list li {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
