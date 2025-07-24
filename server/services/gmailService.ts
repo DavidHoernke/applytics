@@ -1,16 +1,39 @@
 import { google } from 'googleapis';
 import { isJobEmail } from '../utils/EmailClassifier';
 import { ParsedEmail } from '../types/Email';
+import prisma from '../prisma';
 
-export async function fetchJobEmails(token: string): Promise<ParsedEmail[]> {
+export async function fetchJobEmails(token: string, userId: string): Promise<ParsedEmail[]> {
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token: token });
   const gmail = google.gmail({ version: 'v1', auth });
 
-  const messagesRes = await gmail.users.messages.list({
-    userId: 'me',
-    maxResults: 10,
-  });
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+  select: { lastSyncedAt: true },
+});
+
+  let messagesRes;
+  if (user?.lastSyncedAt) {
+    console.log("Last synced at:", user.lastSyncedAt);
+    const after = Math.floor(user.lastSyncedAt.getTime() / 1000);
+    messagesRes = await gmail.users.messages.list({
+      userId: 'me',
+      q: `after:${after}`,
+    });
+  } else {
+    console.log("First-time sync!");
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const after = Math.floor(oneMonthAgo.getTime() / 1000);
+
+    messagesRes = await gmail.users.messages.list({
+      userId: 'me',
+      q: `after:${after}`,
+      maxResults: 50,
+    });
+  }
+
 
   const messageIds = messagesRes.data.messages?.map(m => m.id) || [];
 
@@ -39,3 +62,4 @@ export async function fetchJobEmails(token: string): Promise<ParsedEmail[]> {
 
   return parsedMessages.filter(msg => msg.isJobRelated);
 }
+
